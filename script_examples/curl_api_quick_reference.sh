@@ -125,8 +125,11 @@ curl -X POST "$SERVER/interrupt" \
 # NODE INFORMATION
 # ============================================================================
 
-# List all available nodes
-curl -s "$SERVER/object_info" | python3 -c "import sys,json; print('\n'.join(sorted(json.load(sys.stdin).keys())))"
+# List all available nodes (requires jq)
+curl -s "$SERVER/object_info" | jq -r 'keys[]' | sort
+
+# Alternative: list nodes using grep (less reliable but no dependencies)
+# curl -s "$SERVER/object_info" | grep -o '"[^"]*":' | tr -d '":' | sort | uniq
 
 # Get info about specific node
 curl -s "$SERVER/object_info/LoadImage"

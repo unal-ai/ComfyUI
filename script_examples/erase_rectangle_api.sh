@@ -48,30 +48,25 @@ if [ ! -f "$INPUT_IMAGE" ]; then
     exit 1
 fi
 
-# Check if jq is available for JSON parsing
+# Check if jq is available for JSON parsing (strongly recommended)
 USE_JQ=false
 if command -v jq &> /dev/null; then
     USE_JQ=true
+else
+    echo "Warning: jq not found. Using basic string parsing (less reliable)."
+    echo "For production use, install jq: apt-get install jq / brew install jq"
 fi
 
-# Function to extract JSON value (works without jq)
-json_value() {
+# Function to extract a string value from JSON by key name
+# Note: Only works for simple top-level string values when jq is not available
+json_extract_string() {
     local json="$1"
     local key="$2"
     if [ "$USE_JQ" = true ]; then
         echo "$json" | jq -r ".$key // empty"
     else
-        echo "$json" | grep -o "\"$key\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -1 | sed 's/.*:.*"\([^"]*\)".*/\1/'
-    fi
-}
-
-json_nested_value() {
-    local json="$1"
-    local path="$2"
-    if [ "$USE_JQ" = true ]; then
-        echo "$json" | jq -r "$path // empty"
-    else
-        echo "$json" | grep -o "\"$path\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -1 | sed 's/.*:.*"\([^"]*\)".*/\1/'
+        # Basic regex for extracting quoted string values - works for simple cases
+        echo "$json" | grep -oE "\"$key\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)".*/\1/'
     fi
 }
 
@@ -97,7 +92,7 @@ UPLOAD_RESPONSE=$(curl -s -X POST "${COMFY_URL}/upload/image" \
     -F "type=input" \
     -F "overwrite=true")
 
-IMAGE_NAME=$(json_value "$UPLOAD_RESPONSE" "name")
+IMAGE_NAME=$(json_extract_string "$UPLOAD_RESPONSE" "name")
 
 if [ -z "$IMAGE_NAME" ]; then
     echo "Error: Failed to upload image"

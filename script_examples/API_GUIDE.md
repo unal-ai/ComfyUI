@@ -167,7 +167,7 @@ RECT_X="${2:-100}"         # Rectangle X position
 RECT_Y="${3:-100}"         # Rectangle Y position
 RECT_WIDTH="${4:-200}"     # Rectangle width
 RECT_HEIGHT="${5:-200}"    # Rectangle height
-FILL_COLOR="${6:-1.0}"     # Fill value (0.0=black, 1.0=white)
+FILL_COLOR="${6:-16777215}"  # Fill color as integer (0=black, 16777215=white, i.e., 0xFFFFFF)
 
 # Step 1: Upload the image
 echo "Uploading image..."
@@ -176,6 +176,8 @@ UPLOAD_RESPONSE=$(curl -s -X POST "${COMFY_URL}/upload/image" \
   -F "type=input" \
   -F "overwrite=true")
 
+# Note: The grep/cut approach below is a basic fallback. For production use, install jq.
+# With jq: IMAGE_NAME=$(echo "$UPLOAD_RESPONSE" | jq -r '.name')
 IMAGE_NAME=$(echo "$UPLOAD_RESPONSE" | grep -o '"name"[[:space:]]*:[[:space:]]*"[^"]*"' | cut -d'"' -f4)
 echo "Uploaded as: $IMAGE_NAME"
 
