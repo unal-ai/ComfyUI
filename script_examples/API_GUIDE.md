@@ -347,7 +347,9 @@ For production use, consider using WebSocket to receive real-time execution upda
 wscat -c "ws://127.0.0.1:8188/ws?clientId=my-client-id"
 ```
 
-See `websockets_api_example.py` in this directory for a Python implementation.
+See the Python WebSocket examples in this directory:
+- `websockets_api_example.py` - Basic WebSocket usage with history polling
+- `websockets_api_example_ws_images.py` - Receiving images directly via WebSocket
 
 ### Get Available Nodes
 

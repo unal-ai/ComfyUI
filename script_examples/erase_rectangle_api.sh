@@ -72,7 +72,7 @@ json_extract_string() {
         # Regex breakdown: Match "key" : "value" pattern
         # - \"$key\"           - match the key name in quotes
         # - [[:space:]]*:[[:space:]]* - match colon with optional whitespace
-        # - \"[^\"]*\"         - match the value in quotes (non-greedy)
+        # - \"[^\"]*\"         - match the value in quotes ([^\"]*) matches any chars except quote)
         # Then extract just the value part with sed
         echo "$json" | grep -oE "\"$key\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)".*/\1/'
     fi
