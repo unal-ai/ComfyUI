@@ -288,13 +288,16 @@ echo "Saved to: ${OUTPUT_PREFIX}_result.png"
 
 ```bash
 # Make the script executable
-chmod +x erase_rectangle.sh
+chmod +x erase_rectangle_api.sh
 
-# Run with default parameters (100,100 position, 200x200 size)
-./erase_rectangle.sh input.png
+# Run with default parameters (100,100 position, 200x200 size, white fill)
+./erase_rectangle_api.sh input.png
 
-# Run with custom rectangle
-./erase_rectangle.sh input.png 50 75 300 150 1.0
+# Run with custom rectangle (x=50, y=75, width=300, height=150)
+./erase_rectangle_api.sh input.png 50 75 300 150
+
+# Run with custom fill color (black = 0, white = 16777215)
+./erase_rectangle_api.sh input.png 50 75 300 150 0
 ```
 
 ### Alternative: Using jq for JSON Parsing

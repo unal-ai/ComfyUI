@@ -62,11 +62,14 @@ curl -X POST "$SERVER/prompt" \
         }
     }'
 
-# Submit with custom prompt ID
+# Submit with custom prompt ID (include your full workflow in place of the example above)
 curl -X POST "$SERVER/prompt" \
     -H "Content-Type: application/json" \
     -d '{
-        "prompt": {...},
+        "prompt": {
+            "1": {"class_type": "LoadImage", "inputs": {"image": "example.png"}},
+            "2": {"class_type": "SaveImage", "inputs": {"filename_prefix": "out", "images": ["1", 0]}}
+        },
         "prompt_id": "my-custom-id-12345"
     }'
 

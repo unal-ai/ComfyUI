@@ -27,6 +27,10 @@ set -e
 COMFY_URL="${COMFY_URL:-http://127.0.0.1:8188}"
 TIMEOUT="${TIMEOUT:-300}"
 
+# Maximum canvas size for the solid fill/mask images
+# This should be larger than any input image dimensions
+MAX_CANVAS_SIZE=8192
+
 # Arguments
 INPUT_IMAGE="$1"
 RECT_X="${2:-100}"
@@ -65,7 +69,11 @@ json_extract_string() {
     if [ "$USE_JQ" = true ]; then
         echo "$json" | jq -r ".$key // empty"
     else
-        # Basic regex for extracting quoted string values - works for simple cases
+        # Regex breakdown: Match "key" : "value" pattern
+        # - \"$key\"           - match the key name in quotes
+        # - [[:space:]]*:[[:space:]]* - match colon with optional whitespace
+        # - \"[^\"]*\"         - match the value in quotes (non-greedy)
+        # Then extract just the value part with sed
         echo "$json" | grep -oE "\"$key\"[[:space:]]*:[[:space:]]*\"[^\"]*\"" | head -1 | sed 's/.*:[[:space:]]*"\([^"]*\)".*/\1/'
     fi
 }
@@ -137,8 +145,8 @@ WORKFLOW=$(cat <<EOF
             "class_type": "SolidMask",
             "inputs": {
                 "value": 0.0,
-                "width": 8192,
-                "height": 8192
+                "width": ${MAX_CANVAS_SIZE},
+                "height": ${MAX_CANVAS_SIZE}
             }
         },
         "position_mask": {
@@ -154,8 +162,8 @@ WORKFLOW=$(cat <<EOF
         "fill_image": {
             "class_type": "EmptyImage",
             "inputs": {
-                "width": 8192,
-                "height": 8192,
+                "width": ${MAX_CANVAS_SIZE},
+                "height": ${MAX_CANVAS_SIZE},
                 "batch_size": 1,
                 "color": ${FILL_COLOR}
             }
